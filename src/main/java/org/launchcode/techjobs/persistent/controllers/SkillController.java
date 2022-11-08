@@ -6,6 +6,7 @@ package org.launchcode.techjobs.persistent.controllers;
 import org.launchcode.techjobs.persistent.models.Skill;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -24,13 +25,15 @@ public class SkillController {
     @GetMapping("")
     public String index(Model model){
             model.addAttribute("title", "All Skills");
-        model.addAttribute("skill", skillRepository.findAll());
+        model.addAttribute("skills", skillRepository.findAll());
         return "skills/index";
 
     }
 
     @GetMapping("add")
-    public String displayAddSkillForm(Model model){
+    public String displayAddSkillForm(@RequestParam(required = false) Integer skillId, Model model){
+
+
         model.addAttribute(new Skill());
         return "skills/add";
 

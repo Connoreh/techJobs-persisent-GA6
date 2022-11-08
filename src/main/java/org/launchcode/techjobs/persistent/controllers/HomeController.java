@@ -2,8 +2,10 @@ package org.launchcode.techjobs.persistent.controllers;
 
 import org.launchcode.techjobs.persistent.models.Employer;
 import org.launchcode.techjobs.persistent.models.Job;
+import org.launchcode.techjobs.persistent.models.Skill;
 import org.launchcode.techjobs.persistent.models.data.EmployerRepository;
 import org.launchcode.techjobs.persistent.models.data.JobRepository;
+import org.launchcode.techjobs.persistent.models.data.SkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,19 +29,25 @@ public class HomeController {
     @Autowired
     private JobRepository jobRepository;
 
+    @Autowired
+    private SkillRepository skillRepository;
+
     @RequestMapping("")
     public String index(Model model) {
 
         model.addAttribute("title", "My Jobs");
         model.addAttribute("id", employerRepository.findAll());
+        model.addAttribute("skills", skillRepository.findAll());
 
         return "index";
     }
 
     @GetMapping("add")
     public String displayAddJobForm(Model model) {
+
         model.addAttribute("title", "Add Job");
         model.addAttribute("employers", employerRepository.findAll());
+        model.addAttribute("skills", skillRepository.findAll());
 //        model.addAttribute("job", jobRepository.findAll());
         model.addAttribute(new Job());
         return "add";
@@ -47,18 +55,39 @@ public class HomeController {
 
     @PostMapping("add")
     public String processAddJobForm(@ModelAttribute @Valid Job newJob,
-                                       Errors errors, Model model, @RequestParam int employerId, @RequestParam(required = false) List<Integer> skills) {
+                                       Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
 
         if (errors.hasErrors()) {
-            System.out.println(errors);
+//            System.out.println(errors);
             model.addAttribute("title", "Add Job");
             return "add";
         }
 
-        Optional<Employer> result = employerRepository.findById(employerId);
-        newJob.setEmployer(result.get());
+//        Optional<Skill> result =  skillRepository.findById(skillId);
+//        Skill employer = result.get();
+//        model.addAttribute("title", "Add Skill to: " + employer.getName());
+//        model.addAttribute("skills", skillRepository.findAll());
+//        model.addAttribute("job",employer);
+//        model.addAttribute(new Skill());
 
+        Optional<Employer> employerResult = employerRepository.findById(employerId);
+        if (employerResult.isPresent()) {
+            Employer optEmployer = employerResult.get();
+            newJob.setEmployer(optEmployer);
+        }
 
+//        Optional<Skill> skillResult = skillRepository.findAllById(skills);
+//        Iterable<Skill> skillResult = skillRepository.findAllById(skills);
+//        if (employerResult.isPresent()) {
+
+//        Employer employer = (Employer) employerResult.get();
+//        model.addAttribute("employer", employer);
+            List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
+//        newJob.setSkills(skillResult);
+            newJob.setSkills(skillObjs);
+//        newJob.setSkills(skillObjs);
+
+//    }
 //        newJob.setEmployer();result.toString());
 
 //        if(employerId == null){
@@ -100,7 +129,9 @@ public class HomeController {
 //        newJob.setEmployer(employerRepository.findById(employerId));
 //        model.addAttribute("title", "Employer");
 //        model.addAttribute("employerId", )
-        jobRepository.save(newJob);
+            jobRepository.save(newJob);
+
+//        }
 //        employerRepository.
         return "redirect:";
     }
